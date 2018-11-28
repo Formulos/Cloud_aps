@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+#chaves
+public.pem
+paulo_final.pem
+
 # Distribution / packaging
 .Python
 build/
