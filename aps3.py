@@ -22,6 +22,7 @@ content.close()
 #response = client.create_key_pair(KeyName='test')
 #print(response)
 ec2_tag = [{'ResourceType':'instance','Tags':[{'Key':'Owner','Value':"Paulo"}]}]
+ec2_tag_balancer = [{'ResourceType':'instance','Tags':[{'Key':'Owner','Value':"Paulo_b"}]}]
 
 
 IpPermissions=[
@@ -46,7 +47,7 @@ current_instances = ec2.instances.filter(Filters=[{
 ec2info = []
 for instance in current_instances:
     for tag in instance.tags:
-        if ('Owner'in tag['Key']) and ('Paulo'in tag['Value']):
+        if ('Paulo_b'in tag['Value']) or ('Paulo'in tag['Value']):
             name = tag['Value']
             # Add instance info to a dictionary         
             ec2info.append({
@@ -100,5 +101,17 @@ cd Cloud_aps
 python aps1.py
 
 '''
+initi_comand_b='''#!/bin/bash
+cd home/ubuntu
+git clone https://github.com/Formulos/Cloud_aps
+cd Cloud_aps
+./dependencias_balancer.sh
+python aps1.py
 
-ec2.create_instances(UserData = initi_comand,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag,InstanceType = 't2.micro',MaxCount = 3,MinCount = 3,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )
+'''
+
+
+#normal
+ec2.create_instances(UserData = initi_comand,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag,InstanceType = 't2.micro',MaxCount = 2,MinCount = 2,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )
+#balancer
+ec2.create_instances(UserData = initi_comand,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag_balancer,InstanceType = 't2.micro',MaxCount = 1,MinCount = 1,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )

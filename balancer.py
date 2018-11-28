@@ -37,7 +37,32 @@ task_fields = {
     'uri': fields.Url('task')
 }
 
-class TaskListAPI(Resource):
+#instancias init
+ec2 = boto3.resource('ec2')
+
+current_instances = ec2.instances.filter(Filters=[{
+    'Name': 'instance-state-name',
+    'Values': ['running']}])
+
+ec2info = []
+avalible_inst=[]
+for instance in current_instances:
+    for tag in instance.tags:
+        if ('Owner'in tag['Key']) and ('Paulo'in tag['Value']):
+            name = tag['Value']
+            # Add instance info to a dictionary
+            avalible_inst.append(instance.public_ip_address)         
+            ec2info.append({
+                'Name': name,
+                'ins_id': instance.id,
+                'Type': instance.instance_type,
+                'State': instance.state['Name'],
+                'Private IP': instance.private_ip_address,
+                'Public IP': instance.public_ip_address,
+                'Launch Time': instance.launch_time
+                })
+
+class balancer_list(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -46,10 +71,12 @@ class TaskListAPI(Resource):
                                    location='json')
         self.reqparse.add_argument('description', type=str, default="",
                                    location='json')
-        super(TaskListAPI, self).__init__()
+        super(balancer_list, self).__init__()
 
     def get(self):
-        return {'tasks': [marshal(task, task_fields) for task in tasks]}
+        ip = random.choice(avalible_inst)
+        url = "http://"+ip+":5000"
+        request.get(url)
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -62,52 +89,24 @@ class TaskListAPI(Resource):
         tasks.append(task)
         return {'task': marshal(task, task_fields)}, 201
 
-
-class TaskAPI(Resource):
-
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('title', type=str, location='json')
-        self.reqparse.add_argument('description', type=str, location='json')
-        self.reqparse.add_argument('done', type=bool, location='json')
-        super(TaskAPI, self).__init__()
-
-    def get(self, id):
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
-            abort(404)
-        return {'task': marshal(task[0], task_fields)}
-
-    def put(self, id):
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
-            abort(404)
-        task = task[0]
-        args = self.reqparse.parse_args()
-        for k, v in args.items():
-            if v is not None:
-                task[k] = v
-        return {'task': marshal(task, task_fields)}
-
-    def delete(self, id):
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
-            abort(404)
-        tasks.remove(task[0])
-        return {'result': True}
-
-class Check(Resource):
+class balancer(Resource):
 
     def __init__(self):
-        super(Check, self).__init__()
+        super(balancer, self).__init__()
 
     def get(self):
-        return 200
+        ip = random.choice(avalible_inst)
+        url = "http://"+ip+":5000"
+
+        return request.get(url)
 
 
-api.add_resource(TaskListAPI, '/tasks', endpoint='tasks')
-api.add_resource(TaskAPI, '/tasks/<int:id>', endpoint='task')
-api.add_resource(Check, '/healthcheck', endpoint='healthcheck')
+
+
+api.add_resource(balancer_list, '/tasks', endpoint='tasks')
+#api.add_resource(TaskAPI, '/tasks/<int:id>', endpoint='task')
+#api.add_resource(Check, '/healthcheck', endpoint='healthcheck')
+api.add_resource(balancer, '/load', endpoint='load')
 
 
 if __name__ == '__main__':
