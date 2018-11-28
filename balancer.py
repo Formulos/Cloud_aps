@@ -50,7 +50,7 @@ ec2info = []
 avalible_inst=[]
 for instance in current_instances:
     for tag in instance.tags:
-        if ('Paulo'in tag['Value']):
+        if ('Paulo' in tag['Value']) and ('Paulo_b' not in tag['Value']):
             name = tag['Value']
             # Add instance info to a dictionary
             avalible_inst.append(instance.public_ip_address)         
@@ -64,15 +64,13 @@ for instance in current_instances:
                 'Launch Time': instance.launch_time
                 })
 
+print(avalible_inst)
+print(random.choice(avalible_inst))
+
 class balancer_list(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('title', type=str, required=True,
-                                   help='No task title provided',
-                                   location='json')
-        self.reqparse.add_argument('description', type=str, default="",
-                                   location='json')
         super(balancer_list, self).__init__()
 
     def get(self):
@@ -96,7 +94,7 @@ class balancer_list(Resource):
 #api.add_resource(balancer_list, '/load', endpoint='load')
 #api.add_resource(TaskAPI, '/tasks/<int:id>', endpoint='task')
 #api.add_resource(Check, '/healthcheck', endpoint='healthcheck')
-api.add_resource(balancer_list, '/load', endpoint='load')
+api.add_resource(balancer_list, '/load2', endpoint='load2')
 
 
 if __name__ == '__main__':
