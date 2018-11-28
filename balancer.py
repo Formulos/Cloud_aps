@@ -77,7 +77,7 @@ class balancer_list(Resource):
 
     def get(self):
         ip = random.choice(avalible_inst)
-        url = "http://"+ip+":5000"
+        url = "http://"+ip+":5000/tarefas"
         return redirect(url)
 
     def post(self):
