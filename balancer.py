@@ -38,7 +38,8 @@ task_fields = {
 }
 
 #instancias init
-ec2 = boto3.resource('ec2')
+credentials = boto3.Session().get_credentials()
+ec2 = boto3.resource('ec2', region_name = "us-east-1" , aws_access_key_id = credentials.access_key, aws_secret_access_key = credentials.secret_key)
 
 current_instances = ec2.instances.filter(Filters=[{
     'Name': 'instance-state-name',
