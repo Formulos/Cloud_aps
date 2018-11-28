@@ -98,7 +98,7 @@ cd home/ubuntu
 git clone https://github.com/Formulos/Cloud_aps
 cd Cloud_aps
 ./dependencias.sh
-python aps1.py
+python3 aps1.py
 
 '''
 initi_comand_b='''#!/bin/bash
@@ -106,7 +106,7 @@ cd home/ubuntu
 git clone https://github.com/Formulos/Cloud_aps
 cd Cloud_aps
 ./dependencias_balancer.sh
-python aps1.py
+python3 balancer.py
 
 '''
 
