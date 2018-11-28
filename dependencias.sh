@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo apt install python-pip -y
-pip install flask
-pip install flask_restful
-pip install flask_httpauth
+sudo apt install python3-pip -y
+pip3 install flask
+pip3 install flask_restful
+pip3 install flask_httpauth
