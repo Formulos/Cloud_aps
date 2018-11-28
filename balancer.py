@@ -50,7 +50,7 @@ ec2info = []
 avalible_inst=[]
 for instance in current_instances:
     for tag in instance.tags:
-        if ('Owner'in tag['Key']) and ('Paulo'in tag['Value']):
+        if ('Paulo'in tag['Value']):
             name = tag['Value']
             # Add instance info to a dictionary
             avalible_inst.append(instance.public_ip_address)         
@@ -90,18 +90,6 @@ class balancer_list(Resource):
         }
         tasks.append(task)
         return {'task': marshal(task, task_fields)}, 201
-
-class balancer(Resource):
-
-    def __init__(self):
-        super(balancer, self).__init__()
-
-    def get(self):
-        ip = random.choice(avalible_inst)
-        url = "http://"+ip+":5000"
-
-        return requests.get(url)
-
 
 
 

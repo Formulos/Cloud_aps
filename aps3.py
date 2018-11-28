@@ -110,6 +110,6 @@ python3 balancer.py
 
 
 #normal
-ec2.create_instances(UserData = initi_comand,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag,InstanceType = 't2.micro',MaxCount = 3,MinCount = 3,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )
+ec2.create_instances(UserData = initi_comand,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag,InstanceType = 't2.micro',MaxCount = 2,MinCount = 2,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )
 #balancer
 ec2.create_instances(UserData = initi_comand_b,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag_balancer,InstanceType = 't2.micro',MaxCount = 1,MinCount = 1,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )
