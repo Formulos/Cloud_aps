@@ -1,19 +1,17 @@
 import boto3
 import re
 import requests
-from requests_aws4auth import AWS4Auth
 import sys
 
+region = 'us-east-1' # e.g. us-west-1\n
+service = 'ec2',
 
-#region = 'us-east-1' # e.g. us-west-1\n
-#service = 'ec2',
-
-#credentials = boto3.Session().get_credentials()
-#awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
+credentials = boto3.Session().get_credentials()
+ec2 = boto3.resource('ec2', region_name = "us-east-1" , aws_access_key_id = credentials.access_key, aws_secret_access_key = credentials.secret_key)
 
 client = boto3.client('ec2')
-ec2 = boto3.resource('ec2')
 waiter = client.get_waiter('instance_terminated')
+
 
 content = open("public.pem")
 pubkey = content.read()
@@ -114,4 +112,4 @@ python3 balancer.py
 #normal
 ec2.create_instances(UserData = initi_comand,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag,InstanceType = 't2.micro',MaxCount = 2,MinCount = 2,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )
 #balancer
-ec2.create_instances(UserData = initi_comand,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag_balancer,InstanceType = 't2.micro',MaxCount = 1,MinCount = 1,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )
+ec2.create_instances(UserData = initi_comand_b,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag_balancer,InstanceType = 't2.micro',MaxCount = 1,MinCount = 1,SecurityGroups=['Paulo_Aps'],KeyName = "paulo_final" )
