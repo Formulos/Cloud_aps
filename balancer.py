@@ -3,7 +3,7 @@
 """Alternative version of the ToDo RESTful server implemented using the
 Flask-RESTful extension."""
 
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask, jsonify, abort, make_response,redirect
 from flask_restful import Api, Resource, reqparse, fields, marshal
 from flask_httpauth import HTTPBasicAuth
 import boto3
@@ -78,7 +78,7 @@ class balancer_list(Resource):
     def get(self):
         ip = random.choice(avalible_inst)
         url = "http://"+ip+":5000"
-        request.get(url)
+        return redirect(url)
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -105,7 +105,7 @@ class balancer(Resource):
 
 
 
-api.add_resource(balancer_list, '/load', endpoint='load')
+#api.add_resource(balancer_list, '/load', endpoint='load')
 #api.add_resource(TaskAPI, '/tasks/<int:id>', endpoint='task')
 #api.add_resource(Check, '/healthcheck', endpoint='healthcheck')
 api.add_resource(balancer, '/load', endpoint='load')
