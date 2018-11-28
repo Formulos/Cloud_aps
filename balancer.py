@@ -47,55 +47,45 @@ current_instances = ec2.instances.filter(Filters=[{
     'Values': ['running']}])
 
 ec2info = []
-avalible_inst=[]
+avalible_inst=[] #intancias disponiveis que não sejam o loadbalancer
+all_inst=[]#todas as intancias
 for instance in current_instances:
     for tag in instance.tags:
-        if ('Paulo' in tag['Value']) and ('Paulo_b' not in tag['Value']):
-            name = tag['Value']
-            # Add instance info to a dictionary
-            avalible_inst.append(instance.public_ip_address)         
-            ec2info.append({
-                'Name': name,
-                'ins_id': instance.id,
-                'Type': instance.instance_type,
-                'State': instance.state['Name'],
-                'Private IP': instance.private_ip_address,
-                'Public IP': instance.public_ip_address,
-                'Launch Time': instance.launch_time
-                })
+        if ('Paulo' in tag['Value']): 
+            all_inst.append(instance.public_ip_address)
+            if('Paulo_b' not in tag['Value']):
+                name = tag['Value']
+                # Add instance info to a dictionary
+                avalible_inst.append(instance.public_ip_address)         
+                ec2info.append({
+                    'Name': name,
+                    'ins_id': instance.id,
+                    'Type': instance.instance_type,
+                    'State': instance.state['Name'],
+                    'Private IP': instance.private_ip_address,
+                    'Public IP': instance.public_ip_address,
+                    'Launch Time': instance.launch_time
+                    })
 
 print(avalible_inst)
-print(random.choice(avalible_inst))
+print(all_inst)
 
-class balancer_list(Resource):
+@app.route('/', defaults={'path': ''},methods=['GET', 'POST'])
+@app.route('/<path:path>',methods=['GET', 'POST'])
 
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        super(balancer_list, self).__init__()
+def check_status():
 
-    def get(self):
-        ip = random.choice(avalible_inst)
-        url = "http://" + ip + ":5000/tasks"
-        return redirect(url,code=301)
-
-    def post(self):
-        args = self.reqparse.parse_args()
-        task = {
-            'id': tasks[-1]['id'] + 1,
-            'title': args['title'],
-            'description': args['description'],
-            'done': False
-        }
-        tasks.append(task)
-        return {'task': marshal(task, task_fields)}, 201
+    pass
 
 
 
-#api.add_resource(balancer_list, '/load', endpoint='load')
-#api.add_resource(TaskAPI, '/tasks/<int:id>', endpoint='task')
-#api.add_resource(Check, '/healthcheck', endpoint='healthcheck')
-api.add_resource(balancer_list, '/load2', endpoint='load2')
+def catch_all(path):
+    ip = random.choice(avalible_inst)
+    url = "http://" + ip + ":5000/tasks"
+    return redirect(url,code=307)
 
+#timer
+#timer = threading.Timer(2.0, gfg)
 
 if __name__ == '__main__':
     app.run(debug=True,host="0.0.0.0",port = 5000)
