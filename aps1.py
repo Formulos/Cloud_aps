@@ -3,24 +3,28 @@
 """Alternative version of the ToDo RESTful server implemented using the
 Flask-RESTful extension."""
 
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask, jsonify, abort, make_response,request
 from flask_restful import Api, Resource, reqparse, fields, marshal
 from flask_httpauth import HTTPBasicAuth
+import boto3
+import random
 
 app = Flask(__name__,)
 api = Api(app)
 
+global current_ip
+current_ip = ""
 
 tasks = [
     {
         'id': 1,
-        'title': u'Buy groceries',
+        'title': random.randint(1,101),
         'description': u'Milk, Cheese, Pizza, Fruit, Tylenol',
         'done': False
     },
     {
         'id': 2,
-        'title': u'Learn Python',
+        'title': random.randint(1,101),
         'description': u'Need to find a good Python tutorial on the web',
         'done': False
     }
@@ -32,6 +36,31 @@ task_fields = {
     'done': fields.Boolean,
     'uri': fields.Url('task')
 }
+
+#instancias init
+ec2 = boto3.resource('ec2')
+
+current_instances = ec2.instances.filter(Filters=[{
+    'Name': 'instance-state-name',
+    'Values': ['running']}])
+
+ec2info = []
+avalible_inst=[]
+for instance in current_instances:
+    for tag in instance.tags:
+        if ('Owner'in tag['Key']) and ('Paulo'in tag['Value']):
+            name = tag['Value']
+            # Add instance info to a dictionary
+            avalible_inst.append(instance.public_ip_address)         
+            ec2info.append({
+                'Name': name,
+                'ins_id': instance.id,
+                'Type': instance.instance_type,
+                'State': instance.state['Name'],
+                'Private IP': instance.private_ip_address,
+                'Public IP': instance.public_ip_address,
+                'Launch Time': instance.launch_time
+                })
 
 
 class TaskListAPI(Resource):
@@ -101,10 +130,24 @@ class Check(Resource):
     def get(self):
         return 200
 
+class balancer(Resource):
+
+    def __init__(self):
+        super(balancer, self).__init__()
+
+    def get(self):
+        ip = random.choice(avalible_inst)
+        url = "http://"+ip+":5000"
+
+        return request.get(url)
+
+
+
 
 api.add_resource(TaskListAPI, '/tasks', endpoint='tasks')
 api.add_resource(TaskAPI, '/tasks/<int:id>', endpoint='task')
 api.add_resource(Check, '/healthcheck', endpoint='healthcheck')
+api.add_resource(balancer, '/load', endpoint='load')
 
 
 if __name__ == '__main__':

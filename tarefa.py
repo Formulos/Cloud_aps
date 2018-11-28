@@ -4,7 +4,7 @@ import requests
 import json
 
 
-endpoint = "http://127.0.0.1:5000/tasks"
+endpoint = "http://54.163.7.247:5000/tasks"
 def main():
 
     if sys.argv[1] == 'adicionar':
