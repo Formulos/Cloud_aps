@@ -4,3 +4,5 @@ pip3 install flask
 pip3 install flask_restful
 pip3 install flask_httpauth
 pip3 install boto3
+sudo apt install awscli 
+pip install requests

@@ -3,11 +3,12 @@
 """Alternative version of the ToDo RESTful server implemented using the
 Flask-RESTful extension."""
 
-from flask import Flask, jsonify, abort, make_response,request
+from flask import Flask, jsonify, abort, make_response
 from flask_restful import Api, Resource, reqparse, fields, marshal
 from flask_httpauth import HTTPBasicAuth
 import boto3
 import random
+import requests
 
 app = Flask(__name__,)
 api = Api(app)
@@ -39,7 +40,7 @@ task_fields = {
 
 #instancias init
 credentials = boto3.Session().get_credentials()
-ec2 = boto3.resource('ec2', region_name = "us-east-1" , aws_access_key_id = credentials.access_key, aws_secret_access_key = credentials.secret_key)
+ec2 = boto3.resource('ec2', region_name = "us-east-1")
 
 current_instances = ec2.instances.filter(Filters=[{
     'Name': 'instance-state-name',
@@ -99,12 +100,12 @@ class balancer(Resource):
         ip = random.choice(avalible_inst)
         url = "http://"+ip+":5000"
 
-        return request.get(url)
+        return requests.get(url)
 
 
 
 
-api.add_resource(balancer_list, '/tasks', endpoint='tasks')
+api.add_resource(balancer_list, '/load', endpoint='load')
 #api.add_resource(TaskAPI, '/tasks/<int:id>', endpoint='task')
 #api.add_resource(Check, '/healthcheck', endpoint='healthcheck')
 api.add_resource(balancer, '/load', endpoint='load')
