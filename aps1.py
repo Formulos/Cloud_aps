@@ -6,7 +6,6 @@ Flask-RESTful extension."""
 from flask import Flask, jsonify, abort, make_response,request
 from flask_restful import Api, Resource, reqparse, fields, marshal
 from flask_httpauth import HTTPBasicAuth
-import boto3
 import random
 
 app = Flask(__name__,)
