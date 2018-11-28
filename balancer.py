@@ -72,17 +72,14 @@ print(all_inst)
 
 @app.route('/', defaults={'path': ''},methods=['GET', 'POST'])
 @app.route('/<path:path>',methods=['GET', 'POST'])
-
-def check_status():
-
-    pass
-
-
-
 def catch_all(path):
     ip = random.choice(avalible_inst)
     url = "http://" + ip + ":5000/tasks"
     return redirect(url,code=307)
+
+def check_status():
+    pass
+
 
 #timer
 #timer = threading.Timer(2.0, gfg)
