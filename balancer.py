@@ -77,8 +77,8 @@ class balancer_list(Resource):
 
     def get(self):
         ip = random.choice(avalible_inst)
-        url = "http://"+ip+":5000/tarefas"
-        return redirect(url)
+        url = "http://" + ip + ":5000/tasks"
+        return redirect(url,code=301)
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -108,7 +108,7 @@ class balancer(Resource):
 #api.add_resource(balancer_list, '/load', endpoint='load')
 #api.add_resource(TaskAPI, '/tasks/<int:id>', endpoint='task')
 #api.add_resource(Check, '/healthcheck', endpoint='healthcheck')
-api.add_resource(balancer, '/load', endpoint='load')
+api.add_resource(balancer_list, '/load', endpoint='load')
 
 
 if __name__ == '__main__':
