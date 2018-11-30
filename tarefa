@@ -11,17 +11,11 @@ def main():
         print(
             '''
             help - lista os comandos
-            adicionar - faz um post na lista não recebe argumentos eles são passados por input
-            listar - lista a lista de tarefas
-            buscar - mostra uma tarefa especifca, voce precisar passar o id
-            apagar - apaga uma tarefa, precisa passar o id dela
-            atualizar - atualiza uma tarefa, precisa passar o id dela
+            listar - mostra um one liner
             os comandos seguim essa ordem:
-            ip comando id
+            ip comando
             exemplos:
             tarefa 54.242.200.201 listar
-            tarefa 54.242.200.201 apagar 1
-            tarefa 54.242.200.201 buscar 1
             '''
         )
         sys.exit()
@@ -29,35 +23,12 @@ def main():
     ip = sys.argv[1]
     endpoint = "http://" + ip +":5000"+"/tasks"
 
-    if sys.argv[2] == 'adicionar':
-        titulo = input("titulo:")
-        description = input("descrição:")
-        payload = {'title': titulo , 'description':description}
-        r = requests.post(endpoint, json=payload)
-        print(r.text)
-        print('adicionar concluido')
-        
 
     if sys.argv[2] == 'listar':
         r = requests.get(endpoint)
         print(r.text)
         #get all tarefa
 
-    if sys.argv[2] == 'buscar':
-        r = requests.get(endpoint + "/" + sys.argv[3])
-        #get one id
-
-    if sys.argv[2] == 'apagar':
-        r = requests.delete(endpoint + "/" + sys.argv[3])
-        #put delete
-
-    if sys.argv[2] == 'atualizar':
-        titulo = input("titulo:")
-        description = input("descrição:")
-        payload = {'title': titulo , 'description':description}
-        r = requests.put(endpoint + "/" + sys.argv[3], json=payload)
-        print(r.text)
-        #post tarefa
 
 
 if __name__ == "__main__":

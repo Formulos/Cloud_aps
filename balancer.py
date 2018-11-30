@@ -65,8 +65,6 @@ def update_inst_data():
     ec2info.clear()
     avalible_inst.clear()
     for instance in current_instances:
-        x = instance.describe_attribute(Attribute='userData')
-        print(base64.b64decode(x['UserData']['Value']))
         for tag in instance.tags:
             if ('Paulo' in tag['Value']): 
                 #all_inst.append(instance.public_ip_address)
@@ -89,12 +87,12 @@ update_inst_data()
 print(avalible_inst)
 #print(all_inst)
 
-@app.route('/', defaults={'path': ''},methods=['GET', 'POST','DELETE','UPDATE'])
-@app.route('/<path:path>',methods=['GET', 'POST','DELETE','UPDATE'])
+@app.route('/', defaults={'path': ''},methods=['GET'])
+@app.route('/<path:path>',methods=['GET'])
 def catch_all(path):
 
-    ip =  ip = random.choice(avalible_inst)
-    url = "http://" + ip + ":5000/tasks"
+    ip = random.choice(avalible_inst)
+    url = "http://" + ip + ":5000/liners"
     return redirect(url,code=307)
 
 def check_status():
