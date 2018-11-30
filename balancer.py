@@ -96,7 +96,7 @@ def ip_manager():
     ip = (doc.readlines()[0]).replace('\n','')
     doc.close()
     if (ip not in avalible_inst):
-        print('umm seu ip não a avalido,aqui esta um novo')
+        print('umm seu ip'+ ip +'não a avalido,aqui esta um novo')
         ip = random.choice(avalible_inst)
         update_ip(ip)
         print('seu novo ip é: '+ ip)
