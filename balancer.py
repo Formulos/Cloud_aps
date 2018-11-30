@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 
 """Alternative version of the ToDo RESTful server implemented using the
 Flask-RESTful extension."""
@@ -10,6 +10,7 @@ import boto3
 import random
 import requests
 import threading
+import base64
 
 import sys
 
@@ -59,10 +60,13 @@ ec2info = []
 avalible_inst=[] #ip da intancias disponiveis que não sejam o loadbalancer
 #all_inst=[]#ip de todas as intancias
 
-def update_inst_data(): # lembrar que isso não deleta nada portanto não tira os ips terminados
+def update_inst_data():
+
     ec2info.clear()
     avalible_inst.clear()
     for instance in current_instances:
+        x = instance.describe_attribute(Attribute='userData')
+        print(base64.b64decode(x['UserData']['Value']))
         for tag in instance.tags:
             if ('Paulo' in tag['Value']): 
                 #all_inst.append(instance.public_ip_address)
@@ -79,35 +83,19 @@ def update_inst_data(): # lembrar que isso não deleta nada portanto não tira o
                         'Public IP': instance.public_ip_address,
                         'Launch Time': instance.launch_time
                         })
+
+    
 update_inst_data()
 print(avalible_inst)
 #print(all_inst)
 
-@app.route('/', defaults={'path': ''},methods=['GET', 'POST'])
-@app.route('/<path:path>',methods=['GET', 'POST'])
+@app.route('/', defaults={'path': ''},methods=['GET', 'POST','DELETE','UPDATE'])
+@app.route('/<path:path>',methods=['GET', 'POST','DELETE','UPDATE'])
 def catch_all(path):
 
-    ip = ip_manager()
+    ip =  ip = random.choice(avalible_inst)
     url = "http://" + ip + ":5000/tasks"
     return redirect(url,code=307)
-
-def ip_manager():
-    doc = open("ip","r")
-    ip = (doc.readlines()[0]).replace('\n','')
-    doc.close()
-    if (ip not in avalible_inst):
-        print('umm seu ip'+ ip +'não a avalido,aqui esta um novo')
-        ip = random.choice(avalible_inst)
-        update_ip(ip)
-        print('seu novo ip é: '+ ip)
-    else:
-        print("ok voce ja tinha um ip valido")
-    return ip
-
-def update_ip(ip):
-    doc = open("ip","w")
-    doc.write(ip)
-    doc.close()
 
 def check_status():
     #print("check_status")
@@ -141,19 +129,22 @@ def terminate_broken(broken_inst): # broken_inst deve ser o ip publico dela
     #ec2info[:] = [d for d in ec2info if d.get("Public IP") != broken_inst]
     #avalible_inst.remove(broken_inst)
 
+    
+    
     #faz um update da lista e dic
+    client.terminate_instances(InstanceIds=id_broken)
     update_inst_data()
 
-    client.terminate_instances(InstanceIds=id_broken)
-
+    
     replenish_inst() 
 
 
 
 def replenish_inst(grupo=['Paulo_Aps'],chave = "paulo_final"):
+    print("criando instancias novas")
     data = ec2.create_instances(UserData = initi_comand,ImageId="ami-06cd4dcc1f9e068d9",TagSpecifications=ec2_tag,InstanceType = 't2.micro',MaxCount = 1,MinCount = 1,SecurityGroups=grupo,KeyName = chave )
     data = data[0]
-    print(data)
+    print("esperando")
     waiter_running.wait(InstanceIds=[data.id])
     waiter_ok.wait(InstanceIds=[data.id])
     update_inst_data()
@@ -161,7 +152,8 @@ def replenish_inst(grupo=['Paulo_Aps'],chave = "paulo_final"):
 
 
 if __name__ == '__main__':
-    max_ins_number = 2
+    #voce pode passar uma quantidade de instancias como primeiro argumento de sys.argvs
+    max_ins_number = 3
     if int(len(sys.argv)) > 1 :
         max_ins_number = sys.argv[1]
         max_ins_number = int(max_ins_number)
