@@ -6,3 +6,4 @@ pip3 install flask_httpauth
 pip3 install boto3
 sudo apt install awscli  -y
 pip3 install requests
+pip3 install threading

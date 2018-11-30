@@ -38,7 +38,7 @@ def main():
         payload = {'title': titulo , 'description':description}
         r = requests.put(endpoint + "/" + sys.argv[2], json=payload)
         print(r.text)
-        #post tarefe
+        #post tarefa
 
 
 if __name__ == "__main__":
