@@ -61,6 +61,8 @@ avalible_inst=[] #ip da intancias disponiveis que não sejam o loadbalancer
 #all_inst=[]#ip de todas as intancias
 
 def update_inst_data(): # lembrar que isso não deleta nada portanto não tira os ips terminados
+    ec2info.clear()
+    avalible_inst.clear()
     for instance in current_instances:
         for tag in instance.tags:
             if ('Paulo' in tag['Value']): 
@@ -101,13 +103,14 @@ def check_status():
         except :
             print("tempo expirado")
             terminate_broken(site)
-    #print("tudo bem por aqui")
+    print("tudo bem por aqui(check status)")
     
     if len(avalible_inst) < max_ins_number: # para debug
         print("poucas instancias")
         replenish_inst()
     
     t = threading.Timer(10.0, check_status)
+    print(avalible_inst)
     t.start()
             
             
@@ -117,11 +120,13 @@ def terminate_broken(broken_inst): # broken_inst deve ser o ip publico dela
     id_broken = [inst_data["ins_id"]]
 
     print("update list")
-    #update list and dict
-    ec2info[:] = [d for d in ec2info if d.get("Public IP") != broken_inst]
-    avalible_inst.remove(broken_inst)
+    #deleta list and dict
+    #ec2info[:] = [d for d in ec2info if d.get("Public IP") != broken_inst]
+    #avalible_inst.remove(broken_inst)
 
+    #faz um update da lista e dic
     update_inst_data()
+
     client.terminate_instances(InstanceIds=id_broken)
 
     replenish_inst() 
