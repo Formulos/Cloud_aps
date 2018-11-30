@@ -50,7 +50,6 @@ ec2 = boto3.resource('ec2', region_name = "us-east-1")
 client = boto3.client('ec2')
 waiter_running = client.get_waiter('instance_running')
 waiter_ok = client.get_waiter('instance_status_ok')
-region = 'us-east-1'
 
 current_instances = ec2.instances.filter(Filters=[{
     'Name': 'instance-state-name',
@@ -94,7 +93,7 @@ def catch_all(path):
 
 def ip_manager():
     doc = open("ip","r")
-    ip = doc.readlines()[0]
+    ip = (doc.readlines()[0]).replace('\n','')
     doc.close()
     if (ip not in avalible_inst):
         print('umm seu ip não a avalido,aqui esta um novo')
