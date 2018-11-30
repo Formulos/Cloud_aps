@@ -3,8 +3,11 @@ import sys
 import requests
 import json
 
-
-endpoint = "http://0.0.0.0:5000/tasks"
+doc = open("ip","r")
+ip = doc.readlines()[0]
+doc.close()
+print(ip)
+endpoint = "http://" + ip +":5000"+"/tasks"
 def main():
 
     if sys.argv[1] == 'adicionar':

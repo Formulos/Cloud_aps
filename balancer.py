@@ -50,6 +50,7 @@ ec2 = boto3.resource('ec2', region_name = "us-east-1")
 client = boto3.client('ec2')
 waiter_running = client.get_waiter('instance_running')
 waiter_ok = client.get_waiter('instance_status_ok')
+region = 'us-east-1'
 
 current_instances = ec2.instances.filter(Filters=[{
     'Name': 'instance-state-name',
@@ -87,9 +88,27 @@ print(avalible_inst)
 @app.route('/<path:path>',methods=['GET', 'POST'])
 def catch_all(path):
 
-    ip = random.choice(avalible_inst)
+    ip = ip_manager()
     url = "http://" + ip + ":5000/tasks"
     return redirect(url,code=307)
+
+def ip_manager():
+    doc = open("ip","r")
+    ip = doc.readlines()[0]
+    doc.close()
+    if (ip not in avalible_inst):
+        print('umm seu ip não a avalido,aqui esta um novo')
+        ip = random.choice(avalible_inst)
+        update_ip(ip)
+        print('seu novo ip é: '+ ip)
+    else:
+        print("ok voce ja tinha um ip valido")
+    return ip
+
+def update_ip(ip):
+    doc = open("ip","w")
+    doc.write(ip)
+    doc.close()
 
 def check_status():
     #print("check_status")
@@ -142,11 +161,10 @@ def replenish_inst(grupo=['Paulo_Aps'],chave = "paulo_final"):
     print("lista depois do replenish_inst ",avalible_inst)
 
 
-
-
 if __name__ == '__main__':
     max_ins_number = 2
-    if len(sys.argv) > 1 :
+    if int(len(sys.argv)) > 1 :
         max_ins_number = sys.argv[1]
+        max_ins_number = int(max_ins_number)
     threading.Timer(10.0, check_status).start()
     app.run(debug=False,host="0.0.0.0",port = 5000)

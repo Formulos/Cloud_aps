@@ -9,6 +9,7 @@ __pycache__/
 #chaves
 public.pem
 paulo_final.pem
+debug.py
 
 # Distribution / packaging
 .Python
