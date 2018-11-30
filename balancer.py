@@ -10,7 +10,6 @@ import boto3
 import random
 import requests
 import threading
-import time
 
 import sys
 
